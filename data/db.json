@@ -11,5 +11,28 @@
       "id": 1674050408523
     }
   ],
-  "products": []
+  "products": [
+    {
+      "title": "Node.js",
+      "quantity": "4",
+      "selectCategory": {
+        "title": "Back End",
+        "description": "web Back end",
+        "id": 1674050408523
+      },
+      "id": 1674454830995,
+      "AtCreate": "2023-01-23T06:21:08.866Z"
+    },
+    {
+      "title": "PHP",
+      "quantity": "6",
+      "selectCategory": {
+        "title": "Back End",
+        "description": "web Back end",
+        "id": 1674050408523
+      },
+      "id": 1674455776321,
+      "AtCreate": "2023-01-23T08:41:39.720Z"
+    }
+  ]
 }
