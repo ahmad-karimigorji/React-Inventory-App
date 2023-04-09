@@ -1,10 +1,28 @@
-import { useRef, useState } from "react";
+import Loading from "./Loading/Loading";
 
-const AddCategory = ({ postCategoryHandler }) => {
+import { useEffect, useRef, useState } from "react";
+
+const AddCategory = ({
+  postCategoryHandler,
+  isShowCategory,
+  setIsShowCategory,
+  loading,
+}) => {
   const [category, setCategory] = useState({ title: "", description: "" });
-  const [isShow, setIsShow] = useState(false);
   const titleError = useRef();
   const descriptionError = useRef();
+
+  useEffect(() => {
+    if (!isShowCategory) {
+      setCategory({
+        title: "",
+        description: "",
+      });
+
+      titleError.current.innerText = "";
+      descriptionError.current.innerText = "";
+    }
+  }, [isShowCategory]);
 
   const changeHandler = (e) => {
     const { name, value } = e.target;
@@ -31,33 +49,24 @@ const AddCategory = ({ postCategoryHandler }) => {
     for (const key in category) {
       if (!category[key]) return;
     }
-    postCategoryHandler({ ...category, id: new Date().getTime() });
-
-    cancelBtnHandler();
+    postCategoryHandler(category);
   };
 
-  const cancelBtnHandler = () => {
-    setCategory({
-      title: "",
-      description: "",
-    });
-
-    titleError.current.innerText = "";
-    descriptionError.current.innerText = "";
-
-    setIsShow(false);
-  };
   return (
     <div>
       <h2
         className={`${
-          isShow ? "hidden" : ""
-        } font-bold text-xl text-slate-300 mb-2 hover:cursor-pointer`}
-        onClick={() => setIsShow(true)}
+          isShowCategory ? "hidden" : ""
+        } font-bold text-xl text-slate-300 mb-2 cursor-pointer`}
+        onClick={() => setIsShowCategory(true)}
       >
         Add New Category ?
       </h2>
-      <div className={`${isShow ? "" : "hidden"} p-3 bg-slate-500 rounded-md`}>
+      <div
+        className={`${
+          isShowCategory ? "" : "hidden"
+        } p-3 bg-slate-500 rounded-md`}
+      >
         <form className="space-y-3" onSubmit={submitHandler}>
           <div className="flex flex-col space-y-1">
             <label className="text-slate-300 font-semibold" htmlFor="title">
@@ -94,15 +103,16 @@ const AddCategory = ({ postCategoryHandler }) => {
           </div>
           <div className="flex flex-col space-y-2 space-x-0 sm:flex-row sm:space-y-0">
             <button
-              className="border border-slate-300 rounded-md py-1 bg-slate-300 text-black font-semibold sm:w-1/2 sm:order-1 sm:ml-2"
+              className="flex justify-center items-center gap-1.5 border border-slate-300 rounded-md py-1 bg-slate-300 text-black font-semibold sm:w-1/2 sm:order-1 sm:ml-2"
               type="submit"
             >
-              Add Category
+              {loading.addCategoryLoading && <Loading />} Add Category
             </button>
             <button
               className="border border-slate-300 text-slate-300 rounded-md py-1 font-semibold sm:w-1/2"
               type="button"
-              onClick={cancelBtnHandler}
+              disabled={loading.addCategoryLoading ? true : false}
+              onClick={() => setIsShowCategory(false)}
             >
               Cancel
             </button>

@@ -1,14 +1,36 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import Loading from "./Loading/Loading";
 
-const AddProduct = ({ categories, postProductHandler }) => {
+const AddProduct = ({
+  categories,
+  postProductHandler,
+  loading,
+  isShowProduct,
+  setIsShowProduct,
+}) => {
   const [product, setProduct] = useState({
     title: "",
     quantity: "",
-    selectCategory: "",
+    categoryId: "",
   });
   const titleError = useRef();
   const quantityError = useRef();
   const selectError = useRef();
+
+  useEffect(() => {
+    if (isShowProduct) {
+      setProduct({
+        title: "",
+        quantity: "",
+        categoryId: "",
+      });
+
+      titleError.current.innerText = "";
+      quantityError.current.innerText = "";
+      selectError.current.innerText = "";
+      setIsShowProduct(false);
+    }
+  }, [isShowProduct]);
 
   const changeHandler = (e) => {
     setProduct({ ...product, [e.target.name]: e.target.value });
@@ -25,9 +47,9 @@ const AddProduct = ({ categories, postProductHandler }) => {
           !product[key] &&
             (quantityError.current.innerText = "Quantity is Require");
           break;
-        case "selectCategory":
+        case "categoryId":
           !product[key] &&
-            (selectError.current.innerText = "Select Category is Require");
+            (selectError.current.innerText = "Category is Require");
           break;
 
         default:
@@ -37,28 +59,13 @@ const AddProduct = ({ categories, postProductHandler }) => {
     for (const key in product) {
       if (!product[key]) return;
     }
-    const filteredCategory = categories.find(
-      (item) => item.id === parseInt(product.selectCategory)
-    );
 
     const data = {
       ...product,
-      id: new Date().getTime(),
-      AtCreate: new Date().toISOString(),
-      selectCategory: filteredCategory,
+      categoryId: product.categoryId,
     };
 
     postProductHandler(data);
-
-    setProduct({
-      title: "",
-      quantity: "",
-      selectCategory: "",
-    });
-
-    titleError.current.innerText = "";
-    quantityError.current.innerText = "";
-    selectError.current.innerText = "";
   };
 
   return (
@@ -103,14 +110,14 @@ const AddProduct = ({ categories, postProductHandler }) => {
           <div className="flex flex-col space-y-1">
             <label
               className="text-slate-300 font-semibold"
-              htmlFor="selectCategory"
+              htmlFor="categoryId"
             >
-              Quantity
+              Category
             </label>
             <select
-              name="selectCategory"
-              id="selectCategory"
-              value={product.selectCategory}
+              name="categoryId"
+              id="categoryId"
+              value={product.categoryId}
               onChange={changeHandler}
               className="w-full px-3 py-1.5 outline-none border-2 border-slate-400 rounded-md bg-transparent text-slate-300 resize-none"
             >
@@ -119,21 +126,23 @@ const AddProduct = ({ categories, postProductHandler }) => {
               </option>
               {categories &&
                 categories.map((item) => (
-                  <option className="text-black" key={item.id} value={item.id}>
+                  <option
+                    className="text-black"
+                    key={item._id}
+                    value={item._id}
+                  >
                     {item.title}
                   </option>
                 ))}
             </select>
             <p ref={selectError} className="text-red-300 text-sm"></p>
           </div>
-          <div
-            className={`flex flex-col space-y-2 space-x-0 sm:flex-row sm:space-y-0`}
-          >
+          <div className="flex flex-col space-y-2 space-x-0 sm:flex-row sm:space-y-0">
             <button
-              className={`w-full border border-slate-300 rounded-md py-1 bg-slate-300 text-black font-semibold`}
+              className="flex justify-center items-center gap-1.5 w-full border border-slate-300 rounded-md py-1 bg-slate-300 text-black font-semibold"
               type="submit"
             >
-              Add Product
+              {loading.addProductLoading && <Loading />} Add Product
             </button>
           </div>
         </form>

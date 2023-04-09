@@ -5,9 +5,11 @@ const NavBar = ({ products }) => {
         <h2 className="text-lg sm:text-xl">
           Inventory App with React.js & Tailwind
         </h2>
-        <span className="flex justify-center items-center border-2 border-slate-300 rounded-full w-7 h-7 ml-2">
-          {products ? products.length : "0"}
-        </span>
+        {products && products.length > 0 && (
+          <span className="flex justify-center items-center border-2 border-slate-300 rounded-full w-6 h-6 ml-2">
+            {products.length}
+          </span>
+        )}
       </div>
     </div>
   );

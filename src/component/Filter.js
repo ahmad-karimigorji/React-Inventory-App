@@ -36,7 +36,7 @@ const Filter = ({ setFilteredOption, filteredOption, categories }) => {
           </option>
           {categories &&
             categories.map((item) => (
-              <option className="text-black" key={item.id} value={item.id}>
+              <option className="text-black " key={item._id} value={item._id}>
                 {item.title}
               </option>
             ))}

@@ -1,15 +1,17 @@
 import { useEffect, useRef, useState } from "react";
+import Loading from "./Loading/Loading";
 
 const EditProduct = ({
   categories,
   selectedProduct,
   putProductHandler,
-  setIsShow,
+  setIsShowModal,
+  loading,
 }) => {
   const [product, setProduct] = useState({
     title: "",
     quantity: "",
-    selectCategory: "",
+    categoryId: "",
   });
   const titleError = useRef();
   const quantityError = useRef();
@@ -18,7 +20,7 @@ const EditProduct = ({
   useEffect(() => {
     setProduct({
       ...selectedProduct,
-      selectCategory: selectedProduct.selectCategory.id,
+      categoryId: selectedProduct.categoryId,
     });
   }, []);
 
@@ -37,7 +39,7 @@ const EditProduct = ({
           !product[key] &&
             (quantityError.current.innerText = "Quantity is Require");
           break;
-        case "selectCategory":
+        case "categoryId":
           !product[key] &&
             (selectError.current.innerText = "Select Category is Require");
           break;
@@ -47,20 +49,17 @@ const EditProduct = ({
       }
     }
     for (const key in product) {
-      if (!product[key]) return;
+      console.log(product[key]);
+
+      if (product[key] === "") return;
     }
-    const filteredCategory = categories.find(
-      (item) => item.id === parseInt(product.selectCategory)
-    );
 
     const data = {
       ...product,
-      AtCreate: new Date().toISOString(),
-      selectCategory: filteredCategory,
+      categoryId: product.categoryId,
     };
 
-    putProductHandler(data.id, data);
-    setIsShow(false);
+    putProductHandler(data._id, data);
   };
 
   return (
@@ -105,12 +104,12 @@ const EditProduct = ({
             className="text-slate-300 font-semibold"
             htmlFor="editSelectCategory"
           >
-            Quantity
+            Category
           </label>
           <select
-            name="selectCategory"
+            name="categoryId"
             id="editSelectCategory"
-            value={product.selectCategory}
+            value={product.categoryId}
             onChange={changeHandler}
             className="w-full px-3 py-1.5 outline-none border-2 border-slate-400 rounded-md bg-transparent text-slate-300 resize-none"
           >
@@ -119,25 +118,25 @@ const EditProduct = ({
             </option>
             {categories &&
               categories.map((item) => (
-                <option className="text-black" key={item.id} value={item.id}>
+                <option className="text-black" key={item._id} value={item._id}>
                   {item.title}
                 </option>
               ))}
           </select>
           <p ref={selectError} className="text-red-300 text-sm"></p>
         </div>
-        <div
-          className={`flex flex-col space-y-2 space-x-0 sm:flex-row sm:space-y-0`}
-        >
+        <div className="flex flex-col space-y-2 space-x-0 sm:flex-row sm:space-y-0">
           <button
-            className={`sm:w-1/2 sm:order-1 sm:ml-2 w-full border border-slate-300 rounded-md py-1 bg-slate-300 text-black font-semibold`}
+            className="flex justify-center gap-1.5 items-center sm:w-1/2 sm:order-1 sm:ml-2 w-full border border-slate-300 rounded-md py-1 bg-slate-300 text-black font-semibold"
             type="submit"
           >
-            Update Product
+            {loading.editLoading && <Loading />} Update Product
           </button>
           <button
             className="border border-slate-300 text-slate-300 rounded-md py-1 font-semibold sm:w-1/2"
             type="button"
+            disabled={loading.editLoading ? true : false}
+            onClick={() => setIsShowModal(false)}
           >
             Cancel
           </button>

@@ -11,6 +11,8 @@ import {
 } from "../Services/ProductsServices";
 import ProductList from "../component/ProductList/ProductList";
 import Filter from "../component/Filter";
+import Loading from "../component/Loading/Loading";
+
 const Inventory = () => {
   const [categories, setCategories] = useState(null);
   const [products, setProducts] = useState(null);
@@ -19,6 +21,16 @@ const Inventory = () => {
     selectValue: "Newest",
     searchValue: "",
     selectCategoryId: "",
+  });
+  const [isShowCategory, setIsShowCategory] = useState(false);
+  const [isShowProduct, setIsShowProduct] = useState(false);
+  const [isShowModal, setIsShowModal] = useState(false);
+  const [loading, setLoading] = useState({
+    addCategoryLoading: false,
+    addProductLoading: false,
+    editLoading: false,
+    displayProductsLoading: false,
+    deleteProductLoading: false,
   });
 
   useEffect(() => {
@@ -40,62 +52,81 @@ const Inventory = () => {
     try {
       const { data } = await getCategories();
       setCategories(data);
+      console.log(data);
     } catch (error) {
       console.log(error);
     }
   };
 
   const getAllProduct = async () => {
+    setLoading({ ...loading, displayProductsLoading: true });
+
     try {
       const { data } = await getProducts();
       setProducts(data);
       setAllProducts(data);
+      setLoading({ ...loading, displayProductsLoading: false });
     } catch (error) {
       console.log(error);
+      setLoading({ ...loading, displayProductsLoading: false });
     }
   };
 
   const postCategoryHandler = async (data) => {
+    setLoading({ ...loading, addCategoryLoading: true });
     try {
       await postCategory(data);
       getAllCategory();
+      setIsShowCategory(false);
+      setLoading({ ...loading, addCategoryLoading: false });
     } catch (error) {
       console.log(error);
+      setLoading({ ...loading, addCategoryLoading: false });
     }
   };
 
   const postProductHandler = async (product) => {
+    setLoading({ ...loading, addProductLoading: true });
     try {
       await postProduct(product);
       getAllProduct();
+      setLoading({ ...loading, addProductLoading: false });
+      setIsShowProduct(true);
     } catch (error) {
       console.log(error);
+      setLoading({ ...loading, addProductLoading: false });
     }
   };
 
   const deleteProductHandler = async (id) => {
+    setLoading({ ...loading, deleteProductLoading: true });
+
     try {
       await deleteProduct(id);
       getAllProduct();
-      // console.log("delete", data)
+      setLoading({ ...loading, deleteProductLoading: false });
     } catch (error) {
       console.log(error);
+      setLoading({ ...loading, deleteProductLoading: false });
     }
   };
 
   const putProductHandler = async (id, product) => {
+    setLoading({ ...loading, editLoading: true });
     try {
       await putProduct(id, product);
       getAllProduct();
+      setLoading({ ...loading, editLoading: false });
+      setIsShowModal(false);
     } catch (error) {
       console.log(error);
+      setLoading({ ...loading, editLoading: false });
     }
   };
 
   const searchHandler = (array) => {
     return array.filter((product) =>
-      [product.title, product.selectCategory.title]
-        .join(" ")
+      product.title
         .trim()
         .toLowerCase()
         .includes(filteredOption.searchValue.trim().toLowerCase())
@@ -106,9 +137,9 @@ const Inventory = () => {
     let sortProducts = [...array];
     return sortProducts.sort((a, b) => {
       if (filteredOption.selectValue === "Newest") {
-        return new Date(b.AtCreate) - new Date(a.AtCreate);
+        return new Date(b.updatedAt) - new Date(a.updatedAt);
       } else {
-        return new Date(a.AtCreate) - new Date(b.AtCreate);
+        return new Date(a.updatedAt) - new Date(b.updatedAt);
       }
     });
   };
@@ -117,20 +148,26 @@ const Inventory = () => {
     return !filteredOption.selectCategoryId
       ? array
       : array.filter(
-          (product) =>
-            product.selectCategory.id ===
-            parseInt(filteredOption.selectCategoryId)
+          (product) => product.categoryId === filteredOption.selectCategoryId
         );
   };
 
   return (
     <div className="min-h-screen">
       <NavBar products={products} />
-      <div className="w-[300px] sm:w-[500px] my-0 mx-auto space-y-6 py-8">
-        <AddCategory postCategoryHandler={postCategoryHandler} />
+      <div className="w-full max-w-[500px] my-0 mx-auto space-y-6 py-8 px-4">
+        <AddCategory
+          postCategoryHandler={postCategoryHandler}
+          isShowCategory={isShowCategory}
+          setIsShowCategory={setIsShowCategory}
+          loading={loading}
+        />
         <AddProduct
           categories={categories}
           postProductHandler={postProductHandler}
+          loading={loading}
+          isShowProduct={isShowProduct}
+          setIsShowProduct={setIsShowProduct}
         />
         {products && products.length > 0 && (
           <Filter
@@ -139,13 +176,21 @@ const Inventory = () => {
             filteredOption={filteredOption}
           />
         )}
-        {products && products.length > 0 && (
-          <ProductList
-            products={allProducts}
-            deleteProductHandler={deleteProductHandler}
-            putProductHandler={putProductHandler}
-            categories={categories}
-          />
+        {loading.displayProductsLoading ? (
+          <Loading classStyle={"mx-auto mt-8 text-slate-300 text-2xl"} />
+        ) : (
+          products &&
+          products.length > 0 && (
+            <ProductList
+              products={allProducts}
+              deleteProductHandler={deleteProductHandler}
+              putProductHandler={putProductHandler}
+              categories={categories}
+              loading={loading}
+              isShowModal={isShowModal}
+              setIsShowModal={setIsShowModal}
+            />
+          )
         )}
       </div>
     </div>
