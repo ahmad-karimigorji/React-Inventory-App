@@ -1,6 +1,6 @@
 import axios from "axios";
 
-axios.defaults.baseURL = "http://localhost:3001";
+axios.defaults.baseURL = "https://inventory-app-backend.vercel.app";
 
 const http = {
   get: axios.get,
