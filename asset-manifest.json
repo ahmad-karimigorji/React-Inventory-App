@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/React-Inventory-App/static/css/main.c68a21ea.css",
+    "main.js": "/React-Inventory-App/static/js/main.5680ae14.js",
+    "index.html": "/React-Inventory-App/index.html",
+    "main.c68a21ea.css.map": "/React-Inventory-App/static/css/main.c68a21ea.css.map",
+    "main.5680ae14.js.map": "/React-Inventory-App/static/js/main.5680ae14.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.c68a21ea.css",
+    "static/js/main.5680ae14.js"
+  ]
+}
