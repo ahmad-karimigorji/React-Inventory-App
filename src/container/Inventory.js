@@ -180,6 +180,8 @@ const Inventory = () => {
           <Loading classStyle={"mx-auto mt-8 text-slate-300 text-2xl"} />
         ) : (
           products &&
+          categories &&
+          categories.length > 0 &&
           products.length > 0 && (
             <ProductList
               products={allProducts}
